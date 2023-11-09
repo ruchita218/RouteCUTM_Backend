@@ -1,0 +1,18 @@
+package com.centurionuniversity.routecutm;
+
+import lombok.extern.flogger.Flogger;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
+
+public interface AttendanceInfoRepository extends JpaRepository<AttendanceInfo,Long> {
+
+    List<AttendanceInfo> findByDateAndBusNo(java.sql.Date  date, Long busNo);
+    //List<AttendanceInfo> findByUserinfo(UserInfo userInfo);
+    List<AttendanceInfo>findByDate(java.sql.Date sqlDate);
+
+
+}
