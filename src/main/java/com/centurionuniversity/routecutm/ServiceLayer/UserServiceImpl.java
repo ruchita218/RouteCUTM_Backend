@@ -22,6 +22,10 @@ public class UserServiceImpl implements UserService {
         this.driverInfoRepository=driverInfoRepository;
     }
 
+    @Override
+    public Optional<UserInfo> getUserInfo(Long id) {
+        return userInfoRepository.findById(id);
+    }
 
     @Override
     public String registerUser(UserInfo userInfo) {
@@ -74,25 +78,25 @@ public class UserServiceImpl implements UserService {
         return  shortUUID;
     }
 
-    @Override
-    public String loginUser(UserInfo userInfo) {
-        if (userInfo.getEmail() == null || userInfo.getPassword() == null) {
-            return "Cannot log in. Please enter both email and password.";
-        }
-
-        Optional<UserInfo> userOptional = userInfoRepository.findByEmail(userInfo.getEmail());
-        if (userOptional.isPresent()) {
-            UserInfo user = userOptional.get();
-            if (user.getPassword().equals(userInfo.getPassword())) {
-                // Successful login, return user information
-                return "Logged in successfully";
-            } else {
-                return "Email or password is incorrect.";
-            }
-        } else {
-            return "User is not registered. First register, then log in here.";
-        }
-    }
+//    @Override
+//    public String loginUser(UserInfo userInfo) {
+//        if (userInfo.getEmail() == null || userInfo.getPassword() == null) {
+//            return "Cannot log in. Please enter both email and password.";
+//        }
+//
+//        Optional<UserInfo> userOptional = userInfoRepository.findByEmail(userInfo.getEmail());
+//        if (userOptional.isPresent()) {
+//            UserInfo user = userOptional.get();
+//            if (user.getPassword().equals(userInfo.getPassword())) {
+//                // Successful login, return user information
+//                return "Logged in successfully";
+//            } else {
+//                return "Email or password is incorrect.";
+//            }
+//        } else {
+//            return "User is not registered. First register, then log in here.";
+//        }
+//    }
 
     @Override
     public Object getBusDetailsByUserId(Long userId) {

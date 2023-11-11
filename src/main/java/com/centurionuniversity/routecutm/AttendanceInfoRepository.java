@@ -14,5 +14,8 @@ public interface AttendanceInfoRepository extends JpaRepository<AttendanceInfo,L
     //List<AttendanceInfo> findByUserinfo(UserInfo userInfo);
     List<AttendanceInfo>findByDate(java.sql.Date sqlDate);
 
+    Optional<AttendanceInfo> findByDateAndBusNoAndDriverEmailAndUserEmail(java.sql.Date  date, Long busNo,
+                                                                          String driverEmail, String userEmail);
+
 
 }

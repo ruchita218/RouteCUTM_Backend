@@ -29,27 +29,27 @@ public class AdminServiceImpl implements AdminService{
     public Optional<AdminInfo> getAdminInfo() {
         return adminInfoRepository.findByEmail("ruchita1@gmail.com");
     }
-    @Override
-    public Object loginAdmin(AdminInfo adminInfo) {
-        if (adminInfo.getEmail() == null || adminInfo.getPassword() == null) {
-            return "Cannot log in. Please enter both email and password.";
-        }
-
-        Optional<AdminInfo> adminOptional = adminInfoRepository.findByEmail(adminInfo.getEmail());
-        if (adminOptional.isPresent()) {
-            AdminInfo admin = adminOptional.get();
-            if (admin.getPassword().equals(adminInfo.getPassword())) {
-                // Successful login, return admin information
-                //return "Logged in successfully: Your Email is : "+admin.getEmail();
-                return admin;
-
-            } else {
-                return "Incorrect Email or password";
-            }
-        } else {
-            return "This Admin is not registered.";
-        }
-    }
+//    @Override
+//    public Object loginAdmin(AdminInfo adminInfo) {
+//        if (adminInfo.getEmail() == null || adminInfo.getPassword() == null) {
+//            return "Cannot log in. Please enter both email and password.";
+//        }
+//
+//        Optional<AdminInfo> adminOptional = adminInfoRepository.findByEmail(adminInfo.getEmail());
+//        if (adminOptional.isPresent()) {
+//            AdminInfo admin = adminOptional.get();
+//            if (admin.getPassword().equals(adminInfo.getPassword())) {
+//                // Successful login, return admin information
+//                //return "Logged in successfully: Your Email is : "+admin.getEmail();
+//                return admin;
+//
+//            } else {
+//                return "Incorrect Email or password";
+//            }
+//        } else {
+//            return "This Admin is not registered.";
+//        }
+//    }
 
     @Override
     public String updateAdminPassword(Long id, String oldPass, String newPass){
@@ -114,8 +114,12 @@ public class AdminServiceImpl implements AdminService{
 
     @Override
     public Object addUser(UserInfo userInfo) {
-        if (userInfo.getName() == null || userInfo.getEmail() == null || userInfo.getPassword() == null || userInfo.getLocation() == null || userInfo.getRegistrationNo()==null) {
-            return "Cannot add User. Please enter all fields i.e name,email,password,location,registrationNo";
+        if (userInfo.getName() == "" || userInfo.getEmail() == "" || userInfo.getPassword() == "" || userInfo.getLocation() == "" || userInfo.getRegistrationNo()=="") {
+            return "Cannot add User. Please enter all fields";
+        }
+
+        if(driverInfoRepository.existsByEmail(userInfo.getEmail()) || adminInfoRepository.existsByEmail(userInfo.getEmail())){
+            return "This user is already registered as driver or admin";
         }
 
         if (userInfoRepository.existsByEmail(userInfo.getEmail())) {
@@ -154,7 +158,7 @@ public class AdminServiceImpl implements AdminService{
         UserInfo savedUserInfo = userInfoRepository.save(userInfo);
 
         if (savedUserInfo != null) {
-            return "Success";
+            return "User added successfully.";
         } else {
             return "User registration failed.";
         }
@@ -167,12 +171,15 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
-    public String addDriver(DriverInfo driverInfo) {
-        if (driverInfo.getName() == null || driverInfo.getEmail() == null || driverInfo.getPassword() == null || driverInfo.getContactNo() == null) {
-            return "Cannot add Driver. Please enter all fields i.e name,email,password,contactNo";
+    public Object addDriver(DriverInfo driverInfo) {
+        if (driverInfo.getName() == "" || driverInfo.getEmail() == "" || driverInfo.getPassword() == "" || driverInfo.getContactNo() == "") {
+            return "Cannot add Driver. Please enter all fields.";
+        }
+        if(userInfoRepository.existsByEmail(driverInfo.getEmail()) || adminInfoRepository.existsByEmail(driverInfo.getEmail())){
+            return "This driver is already registered as user or admin";
         }
         if (driverInfoRepository.existsByEmail(driverInfo.getEmail())) {
-            return "Cannot add again. User with this Email is already registered.";
+            return "Cannot add again. Driver with this Email is already registered.";
         }
         if (driverInfo.getPassword().length() < 4) {
             return "Password should be at least 4 characters.";
@@ -180,16 +187,16 @@ public class AdminServiceImpl implements AdminService{
         DriverInfo savedDriverInfo = driverInfoRepository.save(driverInfo);
 
         if (savedDriverInfo != null) {
-            return "Success";
+            return "Driver added successfully.";
         } else {
             return "Driver registration failed.";
         }
     }
 
     @Override
-    public String addBus(BusInfo busInfo) {
-        if (busInfo.getBusNo() == null || busInfo.getLocation() == null||busInfo.getDriverEmail()==null) {
-            return "Cannot add Bus. Please enter all fields i.e busNo,location,driverEmail";
+    public Object addBus(BusInfo busInfo) {
+        if (busInfo.getBusNo() == null || busInfo.getLocation() == ""||busInfo.getDriverEmail()=="") {
+            return "Cannot add Bus. Please enter all fields .";
         }
         if (busInfoRepository.existsByBusNo(busInfo.getBusNo())) {
             return "Cannot add again. Bus with this Bus No is already added.";
@@ -213,7 +220,7 @@ public class AdminServiceImpl implements AdminService{
         }
 
         if (savedBusInfo != null) {
-            return "Success";
+            return "Bus added successfully.";
         } else {
             return "Bus registration failed.";
         }
@@ -354,10 +361,6 @@ public class AdminServiceImpl implements AdminService{
         }
         return "Sorry, User with this id is not present"; // Location not found
     }
-
-
-
-
 
     @Override
     public String deleteBusByBusId(Long busId) {

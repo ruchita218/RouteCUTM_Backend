@@ -2,6 +2,7 @@ package com.centurionuniversity.routecutm.ControllerLayer;
 
 
 import com.centurionuniversity.routecutm.AdminInfo;
+import com.centurionuniversity.routecutm.AttendanceInfo;
 import com.centurionuniversity.routecutm.DriverInfo;
 import com.centurionuniversity.routecutm.RqstRes.PasswordUpdateRequest;
 import com.centurionuniversity.routecutm.ServiceLayer.AdminService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -26,15 +28,26 @@ public class DriverController {
         this.driverService = driverService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> loginDriver(@RequestBody DriverInfo driverInfo) {
-        String loginStatus = driverService.loginDriver(driverInfo);
-        if (loginStatus.equals("Logged in successfully")) {
-            return new ResponseEntity<>(loginStatus, HttpStatus.OK);
+
+    @GetMapping("/getDriver/{id}")
+    public ResponseEntity<DriverInfo> getDriver(@PathVariable Long id) {
+        Optional<DriverInfo> driverOptional = driverService.getDriverInfo(id);
+        if (driverOptional.isPresent()) {
+            return new ResponseEntity<>(driverOptional.get(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(loginStatus, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+//    @PostMapping("/login")
+//    public ResponseEntity<String> loginDriver(@RequestBody DriverInfo driverInfo) {
+//        String loginStatus = driverService.loginDriver(driverInfo);
+//        if (loginStatus.equals("Logged in successfully")) {
+//            return new ResponseEntity<>(loginStatus, HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(loginStatus, HttpStatus.NOT_FOUND);
+//        }
+//    }
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> updateDriverPassword(@PathVariable Long id, @RequestBody PasswordUpdateRequest passwordUpdateRequest) {
@@ -63,16 +76,24 @@ public class DriverController {
     public ResponseEntity<Object> getUsersByDriverId(@PathVariable Long id) {
         Object result = driverService.getUsersByDriverId(id);
 
-        if (result instanceof List) {
+        if (result instanceof Object) {
             // Users found, return the list
             return new ResponseEntity<>(result, HttpStatus.OK);
-        } else if (result instanceof Map) {
-            // Check if it's a message, then return it with the appropriate HTTP status
-            return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
         }
+        else if (result instanceof String) {
+            // Check if it's a message, then return it with the appropriate HTTP status
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
+//        else if (result instanceof Map) {
+//            // Check if it's a message, then return it with the appropriate HTTP status
+//            return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
+//        }
 
         // Handle other cases if needed
-        return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        else{
+            return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @GetMapping("/getRegisteredUsersInDriverBus/{driverId}")
@@ -84,6 +105,15 @@ public class DriverController {
         } else {
             // Handle other cases if needed
             return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/addAttendance")
+    public ResponseEntity<Object> addAttendance(@RequestBody List<AttendanceInfo> attendanceInfoList) {
+        Object result = driverService.addAttendance(attendanceInfoList);
+        if (result instanceof String) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         }
     }
 }

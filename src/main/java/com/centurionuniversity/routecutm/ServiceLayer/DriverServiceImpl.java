@@ -22,26 +22,32 @@ public class DriverServiceImpl implements DriverService{
         this.driverInfoRepository=driverInfoRepository;
         this.attendanceInfoRepository=attendanceInfoRepository;
     }
+
     @Override
-    public String loginDriver(DriverInfo driverInfo) {
-        if (driverInfo.getEmail() == null || driverInfo.getPassword() == null) {
-            return "Cannot log in. Please enter both email and password.";
-        }
-
-        Optional<DriverInfo> driverOptional = driverInfoRepository.findByEmail(driverInfo.getEmail());
-        if (driverOptional.isPresent()) {
-            DriverInfo driver = driverOptional.get();
-            if (driver.getPassword().equals(driverInfo.getPassword())) {
-                // Successful login, return admin information
-                return "Logged in successfully";
-
-            } else {
-                return "Email or password is incorrect.";
-            }
-        } else {
-            return "This Driver is not registered.";
-        }
+    public Optional<DriverInfo> getDriverInfo(Long id) {
+        return driverInfoRepository.findById(id);
     }
+
+//    @Override
+//    public String loginDriver(DriverInfo driverInfo) {
+//        if (driverInfo.getEmail() == null || driverInfo.getPassword() == null) {
+//            return "Cannot log in. Please enter both email and password.";
+//        }
+//
+//        Optional<DriverInfo> driverOptional = driverInfoRepository.findByEmail(driverInfo.getEmail());
+//        if (driverOptional.isPresent()) {
+//            DriverInfo driver = driverOptional.get();
+//            if (driver.getPassword().equals(driverInfo.getPassword())) {
+//                // Successful login, return admin information
+//                return "Logged in successfully";
+//
+//            } else {
+//                return "Email or password is incorrect.";
+//            }
+//        } else {
+//            return "This Driver is not registered.";
+//        }
+//    }
 
     @Override
     public String updateDriverPassword(Long id, String oldPass, String newPass){
@@ -84,24 +90,31 @@ public class DriverServiceImpl implements DriverService{
 
         if (!driverOptional.isPresent()) {
             // Driver with this ID does not exist
-            return new HashMap<String, String>() {{
-                put("message", "Invalid Id or You are Not Registered");
-            }};
+//            return new HashMap<String, String>() {{
+//                put("message", "Invalid Id or You are Not Registered");
+//            }};
+
+            return  "Invalid Id or You are Not Registered";
+
         }
 
         DriverInfo driverInfo = driverOptional.get();
         List<UserInfo> users = userInfoRepository.findByDriverInfo(driverInfo);
 
         if (users.isEmpty()) {
-            return new HashMap<String, String>() {{
-                put("message", "Either you are not assigned a bus or there are no users registered for your bus");
-            }};
+//            return new HashMap<String, String>() {{
+//                put("message", "Either you are not assigned a bus or there are no users registered for your bus");
+//            }};
+
+                return                                                                                                                                                                                  "Either you are not assigned a bus or there are no users registered for your bus";
+
         }
 
         // If users are found, convert them to the desired format
         List<Map<String, Object>> userResponseList = new ArrayList<>();
         for (UserInfo user : users) {
             Map<String, Object> userResponse = new HashMap<>();
+            userResponse.put("id",user.getId());
             userResponse.put("name", user.getName());
             userResponse.put("email", user.getEmail());
             userResponse.put("password", user.getPassword());
@@ -110,6 +123,7 @@ public class DriverServiceImpl implements DriverService{
             userResponse.put("busPassNo",user.getBusPassNo());
             userResponse.put("busInfo",user.getBusInfo());
             userResponse.put("driverInfo",user.getDriverInfo());
+            userResponse.put("code",user.getCode());
 
             userResponseList.add(userResponse);
         }
@@ -142,5 +156,36 @@ public class DriverServiceImpl implements DriverService{
         return new HashMap<String, String>() {{
             put("message", "Total registered users in your bus are: " + registeredUsers);
         }};
+    }
+
+    @Override
+    public Object addAttendance(List<AttendanceInfo> attendanceInfoList) {
+
+//        //convert a String date in the format "yyyy-MM-dd" to a java.sql.Date object.
+//        java.sql.Date sqlDate = java.sql.Date.valueOf(date);
+//
+//        // Convert the String busNo to a Long
+//        Long busNoLong = Long.valueOf(busNo);
+//        List<AttendanceInfo> attendanceDetails = attendanceInfoRepository.findByDate(sqlDate);
+
+            for (AttendanceInfo attendanceInfo : attendanceInfoList) {
+                // Check if attendance record with the same key already exists
+                Optional<AttendanceInfo> existingAttendance = attendanceInfoRepository
+                        .findByDateAndBusNoAndDriverEmailAndUserEmail(
+                                attendanceInfo.getDate(), attendanceInfo.getBusNo(),
+                                attendanceInfo.getDriverEmail(), attendanceInfo.getUserEmail());
+
+                if (existingAttendance.isPresent()) {
+                    // Update the existing record
+                    AttendanceInfo existingInfo = existingAttendance.get();
+                    existingInfo.setStatus(attendanceInfo.getStatus());
+                    attendanceInfoRepository.save(existingInfo);
+                } else {
+                    // Save a new record
+                    attendanceInfoRepository.save(attendanceInfo);
+                }
+            }
+            return "Attendance added successfully";
+
     }
 }

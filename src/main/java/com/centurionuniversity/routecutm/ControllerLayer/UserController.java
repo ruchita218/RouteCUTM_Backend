@@ -1,6 +1,7 @@
 package com.centurionuniversity.routecutm.ControllerLayer;
 
 import com.centurionuniversity.routecutm.BusInfo;
+import com.centurionuniversity.routecutm.DriverInfo;
 import com.centurionuniversity.routecutm.ServiceLayer.UserService;
 import com.centurionuniversity.routecutm.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.centurionuniversity.routecutm.RqstRes.PasswordUpdateRequest;
 
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -22,6 +24,16 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/getUser/{id}")
+    public ResponseEntity<UserInfo> getDriver(@PathVariable Long id) {
+        Optional<UserInfo> driverOptional = userService.getUserInfo(id);
+        if (driverOptional.isPresent()) {
+            return new ResponseEntity<>(driverOptional.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PostMapping("/registerUser")
     public ResponseEntity<String> registerUser(@RequestBody UserInfo userInfo) {
         String registrationStatus = userService.registerUser(userInfo);
@@ -32,15 +44,15 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody UserInfo userInfo) {
-        String loginStatus = userService.loginUser(userInfo);
-        if (loginStatus.equals("Logged in successfully")) {
-            return new ResponseEntity<>(loginStatus, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(loginStatus, HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<String> loginUser(@RequestBody UserInfo userInfo) {
+//        String loginStatus = userService.loginUser(userInfo);
+//        if (loginStatus.equals("Logged in successfully")) {
+//            return new ResponseEntity<>(loginStatus, HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(loginStatus, HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
     @GetMapping("/busDetails/{userId}")
     public ResponseEntity<Object> getBusDetailsByUserId(@PathVariable Long userId) {

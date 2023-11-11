@@ -23,7 +23,7 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @GetMapping("/getadmin")
+    @GetMapping("/getAdmin")
     public ResponseEntity<AdminInfo> getAdmin() {
         Optional<AdminInfo> adminOptional = adminService.getAdminInfo();
         if (adminOptional.isPresent()) {
@@ -33,15 +33,18 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Object> loginAdmin(@RequestBody AdminInfo adminInfo) {
-        Object loginStatus = adminService.loginAdmin(adminInfo);
-        if (loginStatus instanceof AdminInfo) {
-            return new ResponseEntity<>(loginStatus, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(loginStatus, HttpStatus.NOT_FOUND);
-        }
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<Object> loginAdmin(@RequestBody AdminInfo adminInfo) {
+//        Object loginStatus = adminService.loginAdmin(adminInfo);
+//        if (loginStatus instanceof AdminInfo) {
+//            return new ResponseEntity<>(loginStatus, HttpStatus.OK);
+//        }else if(loginStatus instanceof String){
+//            return new ResponseEntity<>(loginStatus, HttpStatus.OK);
+//        }
+//        else {
+//            return new ResponseEntity<>(loginStatus, HttpStatus.NOT_FOUND);
+//        }
+//    }
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> updateAdminPassword(@PathVariable Long id, @RequestBody PasswordUpdateRequest passwordUpdateRequest) {
@@ -115,7 +118,11 @@ public class AdminController {
 
         if (result instanceof List) {
             return new ResponseEntity<>(result, HttpStatus.OK);
-        } else {
+        }
+        else if (result instanceof String) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
+        else {
             return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
         }
     }
@@ -123,29 +130,41 @@ public class AdminController {
     @PostMapping("/addUser")
     public ResponseEntity<Object> addUser(@RequestBody UserInfo userInfo) {
         Object addStatus = adminService.addUser(userInfo);
-        if (addStatus.equals("Success")) {
-            return new ResponseEntity<>("User added successfully. " + "His/her Credentials are " + "Name= " + userInfo.getName() + ", " + "Email= " + userInfo.getEmail() + ", " + "Location= " + userInfo.getLocation() + " Registration No= " + userInfo.getRegistrationNo() + " Bus Pass No= " + userInfo.getBusPassNo() + " Bus Info= " + userInfo.getBusInfo() + "Driver Info= " + userInfo.getDriverInfo(), HttpStatus.CREATED);
-        } else {
+//        if (addStatus.equals("Success")) {
+//            return new ResponseEntity<>("User added successfully.", HttpStatus.CREATED);
+//        }
+        if (addStatus instanceof String) {
+            return new ResponseEntity<>(addStatus, HttpStatus.OK);
+        }
+        else {
             return new ResponseEntity<>(addStatus, HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/addDriver")
-    public ResponseEntity<String> addDriver(@RequestBody DriverInfo driverInfo) {
-        String addStatus = adminService.addDriver(driverInfo);
-        if (addStatus.equals("Success")) {
-            return new ResponseEntity<>("Driver added successfully. " + "His/her Credentials are " + "Name= " + driverInfo.getName() + ", " + "Email= " + driverInfo.getEmail() + ", " + "Contact No=" + driverInfo.getContactNo(), HttpStatus.CREATED);
-        } else {
+    public ResponseEntity<Object> addDriver(@RequestBody DriverInfo driverInfo) {
+        Object addStatus = adminService.addDriver(driverInfo);
+//        if (addStatus.equals("Success")) {
+//            return new ResponseEntity<>("Driver added successfully. " + "His/her Credentials are " + "Name= " + driverInfo.getName() + ", " + "Email= " + driverInfo.getEmail() + ", " + "Contact No=" + driverInfo.getContactNo(), HttpStatus.CREATED);
+//        }
+        if (addStatus instanceof String) {
+            return new ResponseEntity<>(addStatus, HttpStatus.OK);
+        }
+        else {
             return new ResponseEntity<>(addStatus, HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/addBus")
-    public ResponseEntity<String> addBus(@RequestBody BusInfo busInfo) {
-        String addStatus = adminService.addBus(busInfo);
-        if (addStatus.equals("Success")) {
-            return new ResponseEntity<>("Bus added successfully. " + "Credentials are " + "Bus No= " + busInfo.getBusNo() + ", " + "Location= " + busInfo.getLocation() + ", " + "Driver Email=" + busInfo.getDriverEmail(), HttpStatus.CREATED);
-        } else {
+    public ResponseEntity<Object> addBus(@RequestBody BusInfo busInfo) {
+        Object addStatus = adminService.addBus(busInfo);
+//        if (addStatus.equals("Success")) {
+//            return new ResponseEntity<>("Bus added successfully. " + "Credentials are " + "Bus No= " + busInfo.getBusNo() + ", " + "Location= " + busInfo.getLocation() + ", " + "Driver Email=" + busInfo.getDriverEmail(), HttpStatus.CREATED);
+//        }
+        if (addStatus instanceof String) {
+            return new ResponseEntity<>(addStatus, HttpStatus.OK);
+        }
+        else {
             return new ResponseEntity<>(addStatus, HttpStatus.BAD_REQUEST);
         }
     }
