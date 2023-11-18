@@ -245,6 +245,10 @@ public class UserServiceImpl implements UserService {
         if (userEmail=="" || date=="" || userEmail == null || date == null) {
             return "Please fill all the fields";
         }
+
+        if (!userInfoRepository.existsByEmail(userEmail)){
+            return "You are not registered";
+        }
         AttendanceInfo attendanceInfo = attendanceInfoRepository.findByUserEmailAndDate(userEmail, sqlDate);
         if (attendanceInfo != null){
             return attendanceInfo;
