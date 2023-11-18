@@ -17,4 +17,8 @@ public interface UserService {
     Object getdriverDetailsByUserId(Long userId);
     String updateUserPassword(Long id, String oldPass, String newPass);
 
+    Object changeLocation(Long id, String newLocation);
+    List<BusInfo> getAllBuses();
+    Object checkAttendance(String email, String date);
+
 }

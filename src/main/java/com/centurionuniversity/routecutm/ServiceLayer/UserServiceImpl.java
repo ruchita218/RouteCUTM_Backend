@@ -14,12 +14,14 @@ public class UserServiceImpl implements UserService {
     private UserInfoRepository userInfoRepository;
     private BusInfoRepository busInfoRepository;
     private DriverInfoRepository driverInfoRepository;
+    private AttendanceInfoRepository attendanceInfoRepository;
 
     @Autowired
-    public UserServiceImpl(UserInfoRepository userInfoRepository,BusInfoRepository busInfoRepository,DriverInfoRepository driverInfoRepository) {
+    public UserServiceImpl(UserInfoRepository userInfoRepository,BusInfoRepository busInfoRepository,DriverInfoRepository driverInfoRepository,AttendanceInfoRepository attendanceInfoRepository) {
         this.userInfoRepository = userInfoRepository;
         this.busInfoRepository = busInfoRepository;
         this.driverInfoRepository=driverInfoRepository;
+        this.attendanceInfoRepository=attendanceInfoRepository;
     }
 
     @Override
@@ -168,5 +170,88 @@ public class UserServiceImpl implements UserService {
         } else {
             return "Invalid User ID.";
         }
+    }
+    @Override
+    public Object changeLocation(Long id, String newLocation) {
+        if (newLocation == null || newLocation.isEmpty()) {
+            return "Please enter your new location";
+        }
+
+        Optional<UserInfo> userOptional = userInfoRepository.findById(id);
+        if (!userOptional.isPresent()) {
+            return "Sorry, this ID is not present";
+        }
+        System.out.println(id);
+        System.out.println(newLocation);
+
+        UserInfo userInfo = userOptional.get();
+
+        // Set busInfo and driverInfo to null
+        userInfo.setBusInfo(null);
+        userInfo.setDriverInfo(null);
+
+        String oldLocation= userInfo.getLocation();
+        Optional<BusInfo> busInfoOptional1=busInfoRepository.findByLocation(oldLocation);
+        if(busInfoOptional1.isPresent()){
+            BusInfo oldBusInfo=busInfoOptional1.get();
+            Long registeredUsers=oldBusInfo.getRegisteredUsers()-1;
+            oldBusInfo.setRegisteredUsers(registeredUsers);
+            busInfoRepository.save(oldBusInfo);
+        }
+
+
+        // Retrieve data from busInfo table
+        Optional<BusInfo> busInfoOptional = busInfoRepository.findByLocation(newLocation);
+
+        if (!busInfoOptional.isPresent()) {
+            return "Sorry, you cannot change your location because bus for your location is not available in our campus";
+        }
+
+        BusInfo newBusInfo = busInfoOptional.get();
+//        System.out.println("Driver Email: " + newBusInfo.getDriverEmail());
+//        System.out.println("Bus No: " + newBusInfo.getBusNo());
+        Long registeredUsers = newBusInfo.getRegisteredUsers() + 1;
+        newBusInfo.setRegisteredUsers(registeredUsers);
+        busInfoRepository.save(newBusInfo);
+
+        // Set location in userInfo table
+        userInfo.setLocation(newLocation);
+
+        // Set busInfo in userInfo table
+        userInfo.setBusInfo(newBusInfo);
+
+        // Check if driver email exists in driverInfo table
+        if (newBusInfo.getDriverEmail() != null) {
+
+            Optional<DriverInfo> driverInfoOptional = driverInfoRepository.findByEmail(newBusInfo.getDriverEmail());
+            if (driverInfoOptional.isPresent()) {
+                DriverInfo driverInfo = driverInfoOptional.get();
+                userInfo.setDriverInfo(driverInfo);
+            }
+        }
+
+        userInfoRepository.save(userInfo);
+
+        return "Location changed successfully.";
+    }
+    @Override
+    public List<BusInfo> getAllBuses() {
+        return busInfoRepository.findAll();
+    }
+
+    @Override
+    public Object checkAttendance(String userEmail, String date) {
+        java.sql.Date sqlDate = java.sql.Date.valueOf(date);
+        if (userEmail=="" || date=="" || userEmail == null || date == null) {
+            return "Please fill all the fields";
+        }
+        AttendanceInfo attendanceInfo = attendanceInfoRepository.findByUserEmailAndDate(userEmail, sqlDate);
+        if (attendanceInfo != null){
+            return attendanceInfo;
+        }
+        else{
+            return "No attendance is there for this date";
+        }
+//        return "Email id is invalid";
     }
 }

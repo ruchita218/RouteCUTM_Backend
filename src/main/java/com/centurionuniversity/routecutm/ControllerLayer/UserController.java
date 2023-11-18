@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.centurionuniversity.routecutm.RqstRes.PasswordUpdateRequest;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -89,6 +90,40 @@ public class UserController {
             return new ResponseEntity<>(updateStatus, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(updateStatus, HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PutMapping("/changeLocation/{id}")
+    public ResponseEntity<Object> changeLocation(@PathVariable Long id, @RequestBody  Map<String, String> requestBody) {
+        String newLocation=requestBody.get("newLocation");
+        Object result = userService.changeLocation(id, newLocation);
+        //return new ResponseEntity<>(result, HttpStatus.OK);
+        if(result instanceof String){
+            return new ResponseEntity<>(result,HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(result,HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/findBuses")
+    public ResponseEntity<List<BusInfo>> getAllBuses() {
+        List<BusInfo> buses = userService.getAllBuses();
+        if (!buses.isEmpty()) {
+            return new ResponseEntity<>(buses, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @PostMapping("/checkAttendance")
+    public ResponseEntity<Object> checkAttendance(@RequestBody Map<String, String> requestBody) {
+        String userEmail = requestBody.get("userEmail");
+        String date = requestBody.get("date");
+        Object result= userService.checkAttendance(userEmail,date);
+        if(result instanceof String){
+            return new ResponseEntity<>(result,HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(result,HttpStatus.OK);
         }
     }
 }
