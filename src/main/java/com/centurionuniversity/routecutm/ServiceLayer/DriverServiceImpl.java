@@ -106,7 +106,7 @@ public class DriverServiceImpl implements DriverService{
 //                put("message", "Either you are not assigned a bus or there are no users registered for your bus");
 //            }};
 
-                return                                                                                                                                                                                  "Either you are not assigned a bus or there are no users registered for your bus";
+                return "Either you are not assigned a bus or there are no users registered for your bus";
 
         }
 

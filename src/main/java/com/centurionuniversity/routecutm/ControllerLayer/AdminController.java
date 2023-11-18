@@ -202,16 +202,6 @@ public class AdminController {
     }
 
     //delete a particular assigned driver of a bus//or delete a driver_email of a bus by providing bus_id in bus_info table
-    @DeleteMapping("/deleteDriverName/{busId}")
-    public ResponseEntity<String> deleteDriverNameById(@PathVariable Long busId) {
-        String deleteStatus = adminService.deleteDriverNameById(busId);
-        if (deleteStatus.equals("Driver deleted successfully.")) {
-            return new ResponseEntity<>(deleteStatus, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(deleteStatus, HttpStatus.NOT_FOUND);
-        }
-    }
-    //have to do some modification with its return type as object and also return its businfo and driverinfo
 
     @GetMapping("/findUsers/{userId}")
     public ResponseEntity<String> getUser(@PathVariable Long userId) {

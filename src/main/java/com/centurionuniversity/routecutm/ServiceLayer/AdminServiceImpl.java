@@ -326,32 +326,7 @@ public class AdminServiceImpl implements AdminService{
         }
     }
 
-    //delete a particular assigned driver of a bus//or delete a driver_email of a bus by providing bus_id in bus_info table
-    @Override
-    public String deleteDriverNameById(Long busId) {
-        Optional<BusInfo> busOptional = busInfoRepository.findById(busId);
-        if (busOptional.isPresent()) {
-            BusInfo busInfo = busOptional.get();
-            Optional<DriverInfo> driverInfoOptional=driverInfoRepository.findByBusInfo(busInfo);
-            if(driverInfoOptional.isPresent()){
-                DriverInfo driverInfo=driverInfoOptional.get();
-                List<UserInfo>  userInfo=userInfoRepository.findByDriverInfo(driverInfo);
-                for (UserInfo user : userInfo) {
-                    user.setDriverInfo(null);
-                    userInfoRepository.save(user);
-                }
-                driverInfo.setBusInfo(null);
-                driverInfoRepository.save(driverInfo);
-            }
 
-            busInfo.setDriverEmail(null);
-            busInfoRepository.save(busInfo);
-
-            return "Driver deleted successfully.";
-        } else {
-            return "Bus with this ID is not present.";
-        }
-    }
     @Override
     public String getUser(Long userId){
         Optional<UserInfo> userOptional = userInfoRepository.findById(userId);

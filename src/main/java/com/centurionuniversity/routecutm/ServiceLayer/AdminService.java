@@ -21,7 +21,7 @@ public interface AdminService {
     String deleteUserById(Long userId);
     String deleteDriverById(Long driverId);
     String updateBusById(Long id,String email);
-    String deleteDriverNameById(Long busId);
+
     String getUser(Long userId);
 
 
